@@ -1,0 +1,33 @@
+// swift-tools-version: 6.0
+import PackageDescription
+
+let package = Package(
+    name: "AppUpdater",
+    platforms: [
+        .macOS(.v12),
+    ],
+    products: [
+        .library(name: "AppUpdater", targets: ["AppUpdater"]),
+    ],
+    dependencies: [
+        .package(url: "https://github.com/mxcl/Version", from: "2.2.1"),
+    ],
+    targets: [
+        .target(
+            name: "AppUpdater",
+            dependencies: ["Version"],
+            path: ".",
+            exclude: ["LICENSE.md", "README.md", "PHOSPHENE-PATCH.md", "Tests"],
+            sources: ["AppUpdater.swift", "Attestation"],
+            resources: [.process("Resources")]
+        ),
+        .testTarget(
+            name: "AppUpdaterTests",
+            dependencies: ["AppUpdater"],
+            path: "Tests",
+            exclude: ["MANUAL.md", "live-attestation-smoke.sh"],
+            resources: [.process("Fixtures")]
+        ),
+    ],
+    swiftLanguageModes: [.v6]
+)

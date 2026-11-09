@@ -1,0 +1,98 @@
+{
+  "current": 7,
+  "appVersion": "1.9.1",
+  "appBuild": "20261109.1",
+  "releases": [
+    {
+      "version": 1,
+      "title": "Fixed camera",
+      "width": 3840,
+      "height": 2160,
+      "fps": 30,
+      "durationSeconds": 16,
+      "bytes": 18289142,
+      "sha256": "86a1ce670c51306a7c165ab06f3d147948d7dbd285d28fff1a7df1836e78d763",
+      "poster": "assets/night-city-v1.jpg",
+      "download": "https://github.com/korisame/phosphene-night-city/releases/download/wallpaper-v1/Night-City-v1-4K.mp4",
+      "notes": "Archived earlier release."
+    },
+    {
+      "version": 2,
+      "title": "OLED midnight",
+      "width": 3840,
+      "height": 2160,
+      "fps": 30,
+      "durationSeconds": 16,
+      "bytes": 9774788,
+      "sha256": "15b7c582d69fcd0ad7145c53bef45e60412001a07cd792b93124cc143ad09966",
+      "poster": "assets/night-city-v2.jpg",
+      "download": "https://github.com/korisame/phosphene-night-city/releases/download/wallpaper-v2/Night-City-v2-4K.mp4",
+      "notes": "Archived earlier release."
+    },
+    {
+      "version": 3,
+      "title": "After-hours cinema",
+      "width": 3840,
+      "height": 2160,
+      "fps": 30,
+      "durationSeconds": 128,
+      "bytes": 91851737,
+      "sha256": "88d9a499678eb4657ce5f4c8abe0f4144f6d7dddd4e81a2c6cd6c3cb6b2724fb",
+      "poster": "assets/night-city-v3.jpg",
+      "download": "https://github.com/korisame/phosphene-night-city/releases/download/wallpaper-v3/Night-City-v3-4K.mp4",
+      "notes": "Archived earlier release."
+    },
+    {
+      "version": 4,
+      "title": "OLED detail",
+      "width": 3840,
+      "height": 2160,
+      "fps": 30,
+      "durationSeconds": 128,
+      "bytes": 99400542,
+      "sha256": "94ef41d27c945611feb0acbbfdc22d93705b8d557f6e8bd89638da9c5cdf2556",
+      "poster": "assets/night-city-v4.jpg",
+      "download": "https://github.com/korisame/phosphene-night-city/releases/download/wallpaper-v4/Night-City-v4-4K.mp4",
+      "notes": "Archived earlier release."
+    },
+    {
+      "version": 5,
+      "title": "Evolving weather",
+      "width": 3840,
+      "height": 2160,
+      "fps": 30,
+      "durationSeconds": 128,
+      "bytes": 107095960,
+      "sha256": "4f59d6c43d9a21975b0ac3d3431f433c6b325d5a6616d6a3a16a303319723114",
+      "poster": "assets/night-city-v5.jpg",
+      "download": "https://github.com/korisame/phosphene-night-city/releases/download/wallpaper-v5/Night-City-v5-4K.mp4",
+      "notes": "Archived earlier release."
+    },
+    {
+      "version": 6,
+      "title": "Living metropolis",
+      "width": 3840,
+      "height": 2160,
+      "fps": 30,
+      "durationSeconds": 128,
+      "bytes": 111097375,
+      "sha256": "8e291939881c161724ae8c19a3694e9aa2fdb1bdb57498ab17852c14f93f5bc4",
+      "poster": "assets/night-city-v6.jpg",
+      "download": "https://github.com/korisame/phosphene-night-city/releases/download/wallpaper-v6/Night-City-v6-4K.mp4",
+      "notes": "Archived release with the former passing-train effect."
+    },
+    {
+      "version": 7,
+      "title": "Blue district",
+      "width": 3840,
+      "height": 2160,
+      "fps": 30,
+      "durationSeconds": 128,
+      "bytes": 109981653,
+      "sha256": "a4f0335eae5f44793743800dd62801714e47c28a0698157b69b6ea48420fbde0",
+      "poster": "assets/night-city-v7.jpg",
+      "download": "https://github.com/korisame/phosphene-night-city/releases/download/wallpaper-v7/Night-City-v7-4K.mp4",
+      "notes": "Current release. Fixed camera; no passing train."
+    }
+  ]
+}

@@ -8,9 +8,7 @@ enum RampMath {
     /// Ease-in-out cubic: smooth acceleration then deceleration.
     /// t in [0, 1] → output in [0, 1].
     static func easeInOut(_ t: Double) -> Double {
-        t < 0.5
-            ? 4.0 * t * t * t
-            : 1.0 - pow(-2.0 * t + 2.0, 3) / 2.0
+        rustRampEase(t)
     }
 
     /// Timer steps for a ramp covering `distance` (in rate units, 0…1) at
@@ -21,6 +19,6 @@ enum RampMath {
 
     /// The eased rate at `progress` (0…1) of a ramp from `start` to `target`.
     static func rate(from start: Double, to target: Double, progress: Double) -> Double {
-        start + (target - start) * easeInOut(min(max(progress, 0), 1))
+        rustRampRate(start, target, progress)
     }
 }

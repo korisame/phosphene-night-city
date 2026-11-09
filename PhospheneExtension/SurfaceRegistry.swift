@@ -49,6 +49,21 @@ final class SurfaceRegistry: Sendable {
 
     func install(_ surface: HostedSurface, for key: SurfaceKey) {
         lock.withLock { $0.surfaces[key] = surface }
+        Lifecycle.scheduleDisconnectedDisplayCheck()
+    }
+
+    struct DisplaySurface: Sendable {
+        let key: SurfaceKey
+        let displayID: UInt32
+        let isPreview: Bool
+    }
+
+    var displaySurfaces: [DisplaySurface] {
+        lock.withLock { contents in
+            contents.surfaces.compactMap { key, surface in
+                surface.displayID.map { DisplaySurface(key: key, displayID: $0, isPreview: surface.isPreview) }
+            }
+        }
     }
 
     /// Claim the right to create this surface's renderer. True only when the surface
@@ -133,6 +148,9 @@ final class SurfaceRegistry: Sendable {
             for key in matches.keys {
                 contents.surfaces[key] = nil
             }
+            contents.keyForWallpaperUUID = contents.keyForWallpaperUUID.filter {
+                contents.surfaces[$0.value] != nil
+            }
             return matches
         }
         for surface in removed.values {
@@ -146,7 +164,11 @@ final class SurfaceRegistry: Sendable {
     /// playing. Returns whether there was anything to tear down.
     @discardableResult
     func tearDown(_ key: SurfaceKey) -> Bool {
-        guard let removed = lock.withLock({ $0.surfaces.removeValue(forKey: key) }) else { return false }
+        guard let removed = lock.withLock({ contents -> HostedSurface? in
+            let removed = contents.surfaces.removeValue(forKey: key)
+            contents.keyForWallpaperUUID = contents.keyForWallpaperUUID.filter { $0.value != key }
+            return removed
+        }) else { return false }
         removed.renderer?.stop()
         invalidateRemoteContext(removed.caContext)
         return true

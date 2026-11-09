@@ -1,15 +1,6 @@
 {
-  "originHash" : "432c697429efd5307b5240b180af5a4bd63757ede3e28821131f2e21639306a5",
+  "originHash" : "bcc316c5e124118acbec354a2f3896179d39ae06d48a60e5e2c3e49578c3748d",
   "pins" : [
-    {
-      "identity" : "appupdater",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/mxcl/AppUpdater",
-      "state" : {
-        "revision" : "a2b89896ebc6c5194b67d38a0481b13b3a311901",
-        "version" : "4.2.1"
-      }
-    },
     {
       "identity" : "propofol",
       "kind" : "remoteSourceControl",
@@ -17,15 +8,6 @@
       "state" : {
         "revision" : "eac9055ca7373fa94aa5b9b501f3a83b3dc1ef80",
         "version" : "0.2.1"
-      }
-    },
-    {
-      "identity" : "tiptoe",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/artginzburg/Tiptoe",
-      "state" : {
-        "revision" : "a48f105192e28ac2b16ae01d9de16dbb5ffc39c3",
-        "version" : "1.1.0"
       }
     },
     {

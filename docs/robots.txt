@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://korisame.github.io/phosphene-night-city/sitemap.xml

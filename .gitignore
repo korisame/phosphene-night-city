@@ -1,77 +1,35 @@
-# Created by https://gitignore.org
-# Swift.gitignore
-
-# Xcode
-#
-# gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore
-
-## User settings
-xcuserdata/
-
-## Obj-C/Swift specific
-*.hmap
-
-## App packaging
-*.ipa
-*.dSYM.zip
-*.dSYM
-
-## Playgrounds
-timeline.xctimeline
-playground.xcworkspace
-
-# Swift Package Manager
-#
-# Add this line if you want to avoid checking in source code from Swift Package Manager dependencies.
-# Packages/
-# Package.pins
-# Package.resolved
-# *.xcodeproj
-#
-# Xcode automatically generates this directory with a .xcworkspacedata file and xcuserdata
-# hence it is not needed unless you have added a package configuration file to your project
-# .swiftpm
-
-.build/
-
-# CocoaPods
-#
-# We recommend against adding the Pods directory to your .gitignore. However
-# you should judge for yourself, the pros and cons are mentioned at:
-# https://guides.cocoapods.org/using/using-cocoapods.html#should-i-check-the-pods-directory-into-source-control
-#
-# Pods/
-#
-# Add this line if you want to avoid checking in source code from the Xcode workspace
-# *.xcworkspace
-
-# Carthage
-#
-# Add this line if you want to avoid checking in source code from Carthage dependencies.
-# Carthage/Checkouts
-
-Carthage/Build/
-
-# fastlane
-#
-# It is recommended to not store the screenshots in the git repo.
-# Instead, use fastlane to re-generate the screenshots whenever they are needed.
-# For more information about the recommended setup visit:
-# https://docs.fastlane.tools/best-practices/source-control/#source-control
-
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots/**/*.png
-fastlane/test_output
-
-# Secrets
-Secrets.plist
-
-# macOS
+# Local and secret state
 .DS_Store
-
-# Xcode build output
+.env
+.env.*
+*.pem
+*.p12
+*.pfx
+*.key
+*.har
+Secrets.plist
+xcuserdata/
+.swiftpm/
+.build/
 DerivedData/
 build/
-# Coverage output
+*.hmap
+*.dSYM
+*.dSYM.zip
+*.ipa
 *.profraw
+rust-core/target/
+native-rust/target/
+rust-release/
+node_modules/
+.publication/
+# Renderer output is reproducible; source layers remain tracked.
+wallpapers/night-city/qa/
+wallpapers/night-city/*.mp4
+wallpapers/night-city/draft-*.jpg
+wallpapers/night-city/check-*.jpg
+wallpapers/night-city/*-check.json
+wallpapers/night-city/light-map.json
+wallpapers/night-city/validation.json
+wallpapers/night-city/poster.png
+.impeccable/

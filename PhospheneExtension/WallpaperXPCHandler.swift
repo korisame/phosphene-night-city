@@ -38,6 +38,55 @@ enum Lifecycle {
     /// gone (asleep/removed) lets it fire. Short enough to save power promptly, long enough
     /// to ride out a brief sleep/wake flicker.
     static let teardownGrace: TimeInterval = 15.0
+
+    nonisolated(unsafe) private static var offlineSince: [SurfaceKey: DispatchTime] = [:]
+    nonisolated(unsafe) private static var disconnectedCheck: DispatchWorkItem?
+
+    /// WallpaperAgent can retain a desktop surface for an old Sidecar display ID
+    /// without sending invalidate. Confirm physical absence twice, a grace apart.
+    /// A Space change never removes an online display; Settings previews are exempt.
+    static func scheduleDisconnectedDisplayCheck() {
+        queue.async { inspectDisconnectedDisplays() }
+    }
+
+    private static func inspectDisconnectedDisplays() {
+        var count: UInt32 = 0
+        guard CGGetOnlineDisplayList(0, nil, &count) == .success, count > 0 else { return }
+        var displays = [CGDirectDisplayID](repeating: 0, count: Int(count))
+        guard CGGetOnlineDisplayList(count, &displays, &count) == .success else { return }
+        let online = Set(displays.prefix(Int(count)))
+        let now = DispatchTime.now()
+        let surfaces = SurfaceRegistry.shared.displaySurfaces
+        let keys = Set(surfaces.map(\.key))
+        offlineSince = offlineSince.filter { keys.contains($0.key) }
+        var needsRecheck = false
+        for surface in surfaces {
+            guard surface.displayID != 0, !surface.isPreview, !online.contains(surface.displayID) else {
+                offlineSince[surface.key] = nil
+                continue
+            }
+            let first = offlineSince[surface.key] ?? now
+            offlineSince[surface.key] = first
+            let elapsed = (now.uptimeNanoseconds - first.uptimeNanoseconds) / 1_000_000
+            if rustSurfaceReclaim(surface.displayID, 0, 0, elapsed) != 0 {
+                teardownTimers.removeValue(forKey: surface.key)?.cancel()
+                let torn = SurfaceRegistry.shared.tearDown(surface.key)
+                PlaybackStore.post(.surfaceRemoved(surface.key))
+                offlineSince[surface.key] = nil
+                extensionLog("  [offline-display] \(surface.key) absent from online displays \(online.sorted()) for \(elapsed)ms → reclaimed=\(torn)")
+                ShuffleController.shared.syncActiveWithSurfaces()
+            } else {
+                needsRecheck = true
+            }
+        }
+        disconnectedCheck?.cancel()
+        disconnectedCheck = nil
+        if needsRecheck {
+            let work = DispatchWorkItem { inspectDisconnectedDisplays() }
+            disconnectedCheck = work
+            queue.asyncAfter(deadline: .now() + teardownGrace, execute: work)
+        }
+    }
 }
 
 /// Arm (or re-arm) the teardown timer for a surface that was invalidated.

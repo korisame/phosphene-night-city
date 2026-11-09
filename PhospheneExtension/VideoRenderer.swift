@@ -326,6 +326,14 @@ final class VideoRenderer: @unchecked Sendable {
             renderer.stopRequestingMediaData()
             currentReader?.cancelReading()
             nextReader?.cancelReading()
+            currentReader = nil
+            currentOutput = nil
+            nextReader = nil
+            nextOutput = nil
+            variantSelector = nil
+            // stop is permanent: unlike deep pause there is no displayed frame to
+            // preserve. Release the decoder's queued buffers before detaching.
+            renderer.flush(removingDisplayedImage: true)
         }
         displayLayer.removeFromSuperlayer()
     }

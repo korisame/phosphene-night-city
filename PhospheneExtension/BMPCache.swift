@@ -49,7 +49,7 @@ func loadCachedSnapshotImage(forChoice videoID: String?) -> CGImage? {
 /// Write a BMP snapshot of the video's first frame to the Agent's cache directory.
 /// Each video gets its own BMP file (keyed by video ID hash) so the Agent shows
 /// the correct cached frame during transitions between videos.
-func writeBMPSnapshot(videoURL: URL, videoID: String? = nil, displayPixelWidth: Int, displayPixelHeight: Int) async {
+private func performBMPSnapshot(videoURL: URL, videoID: String? = nil, displayPixelWidth: Int, displayPixelHeight: Int) async {
     guard let cacheDir = SurfaceRegistry.shared.cacheDirectoryURL else {
         traceLog("  [BMPCache] No cacheDirectoryURL, skipping")
         return
@@ -69,6 +69,23 @@ func writeBMPSnapshot(videoURL: URL, videoID: String? = nil, displayPixelWidth: 
 
     let hashHex = videoHash(for: videoID ?? videoURL.lastPathComponent)
 
+    guard displayPixelWidth > 0, displayPixelHeight > 0 else { return }
+    let asset = AVURLAsset(url: videoURL)
+    let generator = AVAssetImageGenerator(asset: asset)
+    generator.appliesPreferredTrackTransform = true
+    // Bound extraction to the pixels needed by aspect-fill, retaining all source
+    // pixels whenever the display can use them. This never changes video/profile.
+    if let track = try? await asset.loadTracks(withMediaType: .video).first,
+       let natural = try? await track.load(.naturalSize),
+       let transform = try? await track.load(.preferredTransform) {
+        let oriented = natural.applying(transform)
+        let sourceW = abs(oriented.width), sourceH = abs(oriented.height)
+        if sourceW > 0, sourceH > 0 {
+            let scale = min(1, max(CGFloat(displayPixelWidth) / sourceW, CGFloat(displayPixelHeight) / sourceH))
+            generator.maximumSize = CGSize(width: ceil(sourceW * scale), height: ceil(sourceH * scale))
+        }
+    }
+
     // Check if existing BMP for this video already matches requested dimensions
     if let existing = try? FileManager.default.contentsOfDirectory(at: cacheDir, includingPropertiesForKeys: nil) {
         for bmp in existing where bmp.pathExtension == "bmp" && bmp.lastPathComponent.hasPrefix(hashHex) {
@@ -78,16 +95,18 @@ func writeBMPSnapshot(videoURL: URL, videoID: String? = nil, displayPixelWidth: 
                let existingW = Int(components[1]),
                let existingH = Int(components[2]),
                existingW == displayPixelWidth,
-               existingH == displayPixelHeight {
+               existingH == displayPixelHeight,
+               let imageSource = CGImageSourceCreateWithURL(bmp as CFURL, nil),
+               let properties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil) as? [CFString: Any],
+               let pixelW = properties[kCGImagePropertyPixelWidth] as? Int,
+               let pixelH = properties[kCGImagePropertyPixelHeight] as? Int,
+               pixelW <= Int(ceil(generator.maximumSize.width)),
+               pixelH <= Int(ceil(generator.maximumSize.height)) {
                 traceLog("  [BMPCache] Existing BMP matches \(displayPixelWidth)x\(displayPixelHeight) for \(videoID ?? "?"), skipping")
                 return
             }
         }
     }
-
-    let asset = AVURLAsset(url: videoURL)
-    let generator = AVAssetImageGenerator(asset: asset)
-    generator.appliesPreferredTrackTransform = true
 
     let cgImage: CGImage
     do {
@@ -129,65 +148,28 @@ func writeBMPSnapshot(videoURL: URL, videoID: String? = nil, displayPixelWidth: 
         return
     }
 
-    // Convert BGRA → BGR24 with row padding
-    var pixelData = Data(count: pixelDataSize)
-    bgraData.withUnsafeBytes { bgra in
-        pixelData.withUnsafeMutableBytes { bgr in
-            let src = bgra.baseAddress!.assumingMemoryBound(to: UInt8.self)
-            let dst = bgr.baseAddress!.assumingMemoryBound(to: UInt8.self)
-            for y in 0 ..< height {
-                for x in 0 ..< width {
-                    let si = y * bgraRowBytes + x * 4
-                    let di = y * paddedRowBytes + x * 3
-                    dst[di] = src[si] // B
-                    dst[di + 1] = src[si + 1] // G
-                    dst[di + 2] = src[si + 2] // R
-                }
-            }
-        }
-    }
-
-    // Build BMP: 14-byte file header + 40-byte BITMAPINFOHEADER + pixel data
-    let fileHeaderSize = 14
-    let dibHeaderSize = 40
-    let headerSize = fileHeaderSize + dibHeaderSize
-    let fileSize = headerSize + pixelDataSize
-
-    var bmp = Data(count: headerSize)
-
-    bmp[0] = 0x42; bmp[1] = 0x4D // "BM"
-    bmpWriteLE32(&bmp, offset: 2, value: UInt32(fileSize))
-    bmpWriteLE32(&bmp, offset: 10, value: UInt32(headerSize))
-
-    let d = fileHeaderSize
-    bmpWriteLE32(&bmp, offset: d, value: UInt32(dibHeaderSize))
-    bmpWriteLE32(&bmp, offset: d + 4, value: UInt32(bitPattern: Int32(width)))
-    bmpWriteLE32(&bmp, offset: d + 8, value: UInt32(bitPattern: Int32(-height))) // top-down
-    bmpWriteLE16(&bmp, offset: d + 12, value: 1) // planes
-    bmpWriteLE16(&bmp, offset: d + 14, value: 24) // bits per pixel
-    bmpWriteLE32(&bmp, offset: d + 16, value: 0) // BI_RGB
-    bmpWriteLE32(&bmp, offset: d + 20, value: UInt32(pixelDataSize))
-
-    bmp.append(pixelData)
-
     let timestamp = Date().timeIntervalSinceReferenceDate
     let timestampHex = String(format: "%016llx", timestamp.bitPattern)
     let filename = "\(hashHex)-\(displayPixelWidth)-\(displayPixelHeight)-0-\(timestampHex).bmp"
-
-    // Remove old BMP files for this video from cache
+    let bmpURL = cacheDir.appendingPathComponent(filename)
+    let result = bgraData.withUnsafeBytes { buffer -> Int32 in
+        guard let address = buffer.baseAddress else { return 22 }
+        return bmpURL.path.withCString {
+            rustWriteBMP($0, address, buffer.count, width, height, bgraRowBytes)
+        }
+    }
+    guard result == 0 else {
+        extensionLog("  [BMPCache] Rust atomic streaming write failed: errno \(result)")
+        return
+    }
+    // Only discard older snapshots AFTER the new complete file is visible. A disk
+    // failure leaves the previous lock-screen fallback intact.
     if let contents = try? FileManager.default.contentsOfDirectory(at: cacheDir, includingPropertiesForKeys: nil) {
-        for file in contents where file.pathExtension == "bmp" && file.lastPathComponent.hasPrefix(hashHex) {
+        for file in contents where file != bmpURL && file.pathExtension == "bmp" && file.lastPathComponent.hasPrefix(hashHex) {
             try? FileManager.default.removeItem(at: file)
         }
     }
-
-    let bmpURL = cacheDir.appendingPathComponent(filename)
-    do {
-        try bmp.write(to: bmpURL, options: .atomic)
-        traceLog("  [BMPCache] Wrote \(bmp.count) bytes → \(filename)")
-    } catch {
-        traceLog("  [BMPCache] Write failed: \(error)")
-    }
+    traceLog("  [BMPCache] Streamed \(54 + pixelDataSize) bytes → \(filename)")
 
     // Write cacheVersion.db
     let versionURL = cacheDir.appendingPathComponent("cacheVersion.db")
@@ -204,14 +186,29 @@ private func videoHash(for identifier: String) -> String {
     return hash.map { String(format: "%02x", $0) }.joined()
 }
 
-private func bmpWriteLE32(_ data: inout Data, offset: Int, value: UInt32) {
-    data[offset] = UInt8(value & 0xFF)
-    data[offset + 1] = UInt8((value >> 8) & 0xFF)
-    data[offset + 2] = UInt8((value >> 16) & 0xFF)
-    data[offset + 3] = UInt8((value >> 24) & 0xFF)
+/// One extraction at a time: concurrent display acquires cannot multiply the full
+/// decoded image + BGRA working set. Identical requests share the same Task.
+private actor BMPSnapshotQueue {
+    static let shared = BMPSnapshotQueue()
+    private var tail: Task<Void, Never>?
+    private var pending: [String: Task<Void, Never>] = [:]
+
+    func write(videoURL: URL, videoID: String?, width: Int, height: Int) async {
+        let key = "\(videoURL.path)|\(videoID ?? "")|\(width)x\(height)"
+        if let task = pending[key] { await task.value; return }
+        let previous = tail
+        let task = Task {
+            await previous?.value
+            await performBMPSnapshot(videoURL: videoURL, videoID: videoID, displayPixelWidth: width, displayPixelHeight: height)
+        }
+        pending[key] = task
+        tail = task
+        await task.value
+        pending[key] = nil
+        if pending.isEmpty { tail = nil }
+    }
 }
 
-private func bmpWriteLE16(_ data: inout Data, offset: Int, value: UInt16) {
-    data[offset] = UInt8(value & 0xFF)
-    data[offset + 1] = UInt8((value >> 8) & 0xFF)
+func writeBMPSnapshot(videoURL: URL, videoID: String? = nil, displayPixelWidth: Int, displayPixelHeight: Int) async {
+    await BMPSnapshotQueue.shared.write(videoURL: videoURL, videoID: videoID, width: displayPixelWidth, height: displayPixelHeight)
 }

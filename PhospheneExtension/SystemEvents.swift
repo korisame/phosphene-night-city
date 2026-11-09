@@ -5,6 +5,10 @@ import CoreGraphics
 enum SystemEvents {
     static func start() {
         PlaybackStore.post(.screenLockChanged(isScreenLockedNow()))
+        CGDisplayRegisterReconfigurationCallback({ _, flags, _ in
+            guard !flags.contains(.beginConfigurationFlag) else { return }
+            Lifecycle.scheduleDisconnectedDisplayCheck()
+        }, nil)
 
         let workspace = NSWorkspace.shared.notificationCenter
         workspace.addObserver(forName: NSWorkspace.screensDidSleepNotification, object: nil, queue: .main) { _ in

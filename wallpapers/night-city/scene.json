@@ -1,0 +1,295 @@
+{
+  "revision": 22,
+  "name": "Night City \u00b7 Blue district \u00b7 4K",
+  "width": 3840,
+  "height": 2160,
+  "fps": 30,
+  "durationSeconds": 128,
+  "ambientMotionPeriodSeconds": 16,
+  "breathBoundaries": [
+    0,
+    5.2,
+    10.8,
+    16.2,
+    21.6,
+    26.8,
+    32.1,
+    37.6,
+    43.2,
+    48,
+    53.4,
+    58.5,
+    64.3,
+    69.5,
+    74.9,
+    80.4,
+    85.6,
+    91.2,
+    96.5,
+    102.2,
+    107.3,
+    112.8,
+    118,
+    123.4,
+    128
+  ],
+  "breathLiftsPixels": [
+    1.08,
+    1.15,
+    1.22,
+    1.1,
+    1.17,
+    1.24,
+    1.12,
+    1.19,
+    1.26,
+    1.14,
+    1.21,
+    1.09,
+    1.16,
+    1.23,
+    1.11,
+    1.18,
+    1.25,
+    1.13,
+    1.2,
+    1.08,
+    1.15,
+    1.22,
+    1.1,
+    1.17
+  ],
+  "postureEvents": [
+    {
+      "start": 2,
+      "rise": 3,
+      "hold": 5,
+      "fall": 3,
+      "gain": 1
+    },
+    {
+      "start": 23,
+      "rise": 5,
+      "hold": 8,
+      "fall": 5,
+      "gain": -0.32
+    },
+    {
+      "start": 56,
+      "rise": 4.5,
+      "hold": 6,
+      "fall": 4.5,
+      "gain": 0.43
+    },
+    {
+      "start": 91,
+      "rise": 5,
+      "hold": 9,
+      "fall": 6,
+      "gain": -0.38
+    }
+  ],
+  "portraitBlinkTimes": [
+    3.1,
+    7.4,
+    12.2,
+    17.3,
+    21.9,
+    27.6,
+    31.8,
+    38.5,
+    43.2,
+    47.5,
+    52.3,
+    57.4,
+    62,
+    67.7,
+    71.9,
+    78.6,
+    83.3,
+    87.6,
+    92.4,
+    97.5,
+    102.1,
+    107.8,
+    112,
+    118.7,
+    123.4
+  ],
+  "centralBlinkTimes": [
+    2.65,
+    6.95,
+    11.65,
+    16.45,
+    21.4,
+    26.6,
+    31.25,
+    36.9,
+    42.4,
+    46.1,
+    50.4,
+    55.1,
+    59.9,
+    64.85,
+    70.05,
+    74.7,
+    80.35,
+    85.85,
+    89.55,
+    93.85,
+    98.55,
+    103.35,
+    108.3,
+    113.5,
+    118.15,
+    123.8
+  ],
+  "windowOnDwellSeconds": [
+    40,
+    106
+  ],
+  "neonFaultSchedules": {
+    "pink bridge segment": [
+      [
+        13.43,
+        0.12,
+        0.45
+      ],
+      [
+        13.65,
+        0.08,
+        0.24
+      ],
+      [
+        79.01,
+        0.1,
+        0.18
+      ]
+    ],
+    "cyan service panel": [
+      [
+        48.23,
+        0.16,
+        0.29
+      ],
+      [
+        48.47,
+        0.1,
+        0.43
+      ]
+    ],
+    "roof neon circuit": [
+      [
+        93.46,
+        0.21,
+        0.34
+      ]
+    ],
+    "right facade trim": [
+      [
+        112.16,
+        0.1,
+        0.2
+      ],
+      [
+        112.32,
+        0.12,
+        0.35
+      ]
+    ]
+  },
+  "smallDisplayFaults": [
+    [
+      69.05,
+      0.15,
+      0.16
+    ],
+    [
+      69.29,
+      0.1,
+      0.24
+    ]
+  ],
+  "encodingRange": "pc",
+  "weather": {
+    "rainIntensity": [
+      0.62,
+      1.44
+    ],
+    "gusts": [
+      [
+        27,
+        14,
+        0.9
+      ],
+      [
+        73,
+        19,
+        0.75
+      ],
+      [
+        107,
+        13,
+        1
+      ]
+    ],
+    "cloudLayers": 2
+  },
+  "cityEvents": {
+    "searchlight": {
+      "start": 34,
+      "duration": 15
+    },
+    "upperAdChange": {
+      "start": 77,
+      "rise": 2,
+      "hold": 22,
+      "fall": 2
+    }
+  },
+  "cityLife": {
+    "trains": [],
+    "glances": [
+      {
+        "start": 19,
+        "rise": 2.6,
+        "hold": 2,
+        "fall": 3.8,
+        "degrees": -2
+      },
+      {
+        "start": 58,
+        "rise": 3,
+        "hold": 2.5,
+        "fall": 4,
+        "degrees": -1.5
+      },
+      {
+        "start": 102,
+        "rise": 2.8,
+        "hold": 1.8,
+        "fall": 4,
+        "degrees": 1
+      }
+    ]
+  },
+  "blueDistrict": {
+    "vapor": true,
+    "facadeLightStreams": true,
+    "bridgeTraffic": true,
+    "panoramicElevators": true,
+    "rareAVCrossings": [
+      {
+        "start": 31,
+        "duration": 17,
+        "direction": 1
+      },
+      {
+        "start": 99,
+        "duration": 20,
+        "direction": -1
+      }
+    ],
+    "trainsRemoved": true
+  }
+}

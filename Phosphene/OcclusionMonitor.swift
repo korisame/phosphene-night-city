@@ -185,10 +185,11 @@ final class OcclusionMonitor {
                 height: frame.height,
             )
 
-            if OcclusionMath.hasFullscreenApp(full: cgFull, visible: cgVisible, windows: occludingWindows) {
+            let coverage = RustOcclusion.result(full: cgFull, visible: cgVisible, windows: occludingWindows)
+            if coverage & 2 != 0 {
                 fullscreen.insert(displayID)
             }
-            if OcclusionMath.isOccluded(cgVisible, by: occludingWindows) {
+            if coverage & 1 != 0 {
                 occluded.insert(displayID)
             }
         }

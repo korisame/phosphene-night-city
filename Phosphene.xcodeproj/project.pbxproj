@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E5700000000000000000C03 /* AppUpdater in Frameworks */ = {isa = PBXBuildFile; productRef = 7E5700000000000000000C02 /* AppUpdater */; };
 		0B33648A2F4FCB4B00060732 /* PhospheneExtension.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = 0B3364832F4FCB4B00060732 /* PhospheneExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		0B486A22303E6604001CB276 /* TiptoeGitHub in Frameworks */ = {isa = PBXBuildFile; productRef = 7A0000000000000000000002 /* TiptoeGitHub */; };
 /* End PBXBuildFile section */
@@ -53,6 +54,7 @@
 				PlaybackModel.swift,
 				PlaybackPolicy.swift,
 				RampMath.swift,
+				RustCore.swift,
 				VariantSelection.swift,
 			);
 			target = 7E5700000000000000000A03 /* PhospheneTests */;
@@ -61,6 +63,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				OcclusionMath.swift,
+				RustOcclusion.swift,
 				WallpaperStoreParser.swift,
 			);
 			target = 7E5700000000000000000A03 /* PhospheneTests */;
@@ -101,6 +104,7 @@
 		AA9B91C62E900B9E008812A9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				7E5700000000000000000C03 /* AppUpdater in Frameworks */,
 				0B486A22303E6604001CB276 /* TiptoeGitHub in Frameworks */,
 			);
 		};
@@ -139,6 +143,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0B33648F2F4FCB4B00060732 /* Build configuration list for PBXNativeTarget "PhospheneExtension" */;
 			buildPhases = (
+				7E5700000000000000000AB0 /* Build Rust Core */,
 				0B33647F2F4FCB4B00060732 /* Sources */,
 				0B3364802F4FCB4B00060732 /* Frameworks */,
 				0B3364812F4FCB4B00060732 /* Resources */,
@@ -172,6 +177,7 @@
 			);
 			name = Phosphene;
 			packageProductDependencies = (
+				7E5700000000000000000C02 /* AppUpdater */,
 				7A0000000000000000000002 /* TiptoeGitHub */,
 				7B0000000000000000000002 /* Propofol */,
 			);
@@ -228,6 +234,7 @@
 			mainGroup = AA9B91C02E900B9E008812A9;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				7E5700000000000000000C01 /* XCLocalSwiftPackageReference "Vendor/AppUpdater" */,
 				7A0000000000000000000001 /* XCRemoteSwiftPackageReference "Tiptoe" */,
 				7B0000000000000000000001 /* XCRemoteSwiftPackageReference "propofol" */,
 			);
@@ -260,6 +267,21 @@
 			);
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+        7E5700000000000000000AB0 /* Build Rust Core */ = {
+            isa = PBXShellScriptBuildPhase;
+            alwaysOutOfDate = 1;
+            buildActionMask = 2147483647;
+            files = ();
+            inputPaths = ("$(SRCROOT)/rust-core/src/lib.rs", "$(SRCROOT)/rust-core/Cargo.toml");
+            name = "Build Rust Core";
+            outputPaths = ("$(SRCROOT)/rust-core/target/universal/release/libphosphene_core.a");
+            runOnlyForDeploymentPostprocessing = 0;
+            shellPath = /bin/zsh;
+            shellScript = "\"$SRCROOT/build-rust-core.sh\"";
+        };
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0B33647F2F4FCB4B00060732 /* Sources */ = {
@@ -355,6 +377,7 @@
 		AA9B91D22E900B9F008812A9 /* Debug configuration for PBXProject "Phosphene" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+                OTHER_LDFLAGS = "$(inherited) -L$(SRCROOT)/rust-core/target/universal/release -lphosphene_core";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -390,7 +413,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -427,6 +450,7 @@
 		AA9B91D32E900B9F008812A9 /* Release configuration for PBXProject "Phosphene" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+                OTHER_LDFLAGS = "$(inherited) -L$(SRCROOT)/rust-core/target/universal/release -lphosphene_core";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -462,7 +486,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -660,13 +684,9 @@
 				minimumVersion = 0.2.1;
 			};
 		};
-		7A0000000000000000000001 /* XCRemoteSwiftPackageReference "Tiptoe" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/artginzburg/Tiptoe";
-			requirement = {
-				kind = exactVersion;
-				version = 1.1.0;
-			};
+		7A0000000000000000000001 /* XCLocalSwiftPackageReference "Tiptoe" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Vendor/Tiptoe;
 			traits = (
 				GitHubSupport,
 			);
@@ -674,6 +694,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		7E5700000000000000000C02 /* AppUpdater */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7E5700000000000000000C01 /* XCLocalSwiftPackageReference "Vendor/AppUpdater" */;
+			productName = AppUpdater;
+		};
 		7B0000000000000000000002 /* Propofol */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 7B0000000000000000000001 /* XCRemoteSwiftPackageReference "propofol" */;
@@ -685,6 +710,13 @@
 			productName = TiptoeGitHub;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		7E5700000000000000000C01 /* XCLocalSwiftPackageReference "Vendor/AppUpdater" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Vendor/AppUpdater;
+		};
+/* End XCLocalSwiftPackageReference section */
 	};
 	rootObject = AA9B91C12E900B9E008812A9 /* Project object */;
 }

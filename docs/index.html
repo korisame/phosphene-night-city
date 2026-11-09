@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080b12">
+  <title>Phosphene · Night City Edition — a living 4K desktop</title>
+  <meta name="description" content="A fixed-camera, animated 4K Night City wallpaper. Explore the scene, download the film, and meet the native Rust community edition of Phosphene for macOS.">
+  <meta property="og:title" content="Night City. Still awake.">
+  <meta property="og:description" content="A living 4K desktop. Phosphene · Night City Edition.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://korisame.github.io/phosphene-night-city/">
+  <meta property="og:image" content="https://korisame.github.io/phosphene-night-city/assets/social-preview.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://korisame.github.io/phosphene-night-city/">
+  <link rel="icon" type="image/png" href="assets/phosphene-icon.png">
+  <link rel="preload" href="assets/fonts/BarlowCondensed-SemiBold.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <a class="brand" href="#main" aria-label="Phosphene Night City home"><img src="assets/phosphene-icon.png" width="40" height="40" alt=""><span>Phosphene<span class="edition">Night City Edition</span></span></a>
+  <nav aria-label="Main navigation"><a href="#scene">The scene</a><a href="#player">The player</a><a href="#downloads">Downloads</a><a class="source-link" href="https://github.com/korisame/phosphene-night-city">GitHub <span aria-hidden="true">↗</span></a></nav>
+</header>
+<main id="main">
+  <section class="hero" aria-labelledby="hero-title">
+    <img class="hero-poster" src="assets/night-city-4k.webp" alt="A blue-lit futuristic city at night, with a figure in a yellow jacket watching from a rain-soaked rooftop." width="3840" height="2160" fetchpriority="high">
+    <video id="hero-video" class="hero-video" playsinline muted loop preload="none" poster="assets/night-city-4k.webp" aria-label="Twenty-four-second excerpt of the animated Night City wallpaper"><source src="assets/night-city-preview.mp4" type="video/mp4"></video>
+    <div class="hero-shade"></div>
+    <div class="hero-copy"><h1 id="hero-title">Night City.<br>Still awake.</h1><p>Rain in the distance. Light in the windows.<br>A little life, every time you look up.</p>
+      <div class="hero-actions"><a class="button primary" href="#downloads">Get the 4K wallpaper <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14m-6-6 6 6 6-6M5 21h14"/></svg></a><button class="button play" id="motion-toggle" aria-controls="hero-video" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7Z"/></svg><span>Play 24-second preview</span></button></div>
+      <p class="playback-message" id="playback-message" role="status">Fixed camera. No zoom or camera drift.</p>
+    </div>
+    <div class="hero-caption"><span>Blue district · Wallpaper v7</span><span>3840 × 2160 / 30 fps / 128-second loop</span><a href="assets/night-city-preview.mp4">Open the preview video <span aria-hidden="true">↗</span></a></div>
+  </section>
+
+  <section class="scene section" id="scene" aria-labelledby="scene-title">
+    <div class="section-heading"><h2 id="scene-title">The night has<br>its own rhythm.</h2><p>The camera stays still. The city does the moving. This Edgerunners-inspired fan artwork is built from layered illustrations and individually timed animation.</p></div>
+    <div class="stills">
+      <figure><img src="assets/detail-city.webp" width="1000" height="1120" alt="Cyan towers, small bridge lights and suspended vapor in the blue district." loading="lazy"><figcaption><h3>Light that lives here.</h3><p>Windows switch, signs animate and tiny vehicles travel the bridge decks. The main blue light stays steady.</p></figcaption></figure>
+      <figure><img src="assets/detail-weather.webp" width="1000" height="1120" alt="A dark skyline with illuminated cloud edges and a low, wet horizon." loading="lazy"><figcaption><h3>Weather, taking its time.</h3><p>Drifting mist, changing rain and wet reflections bring depth to the still skyline.</p></figcaption></figure>
+      <figure><img src="assets/detail-rooftop.webp" width="1000" height="1120" alt="The yellow jacket, cyan railing and reflections on the rooftop." loading="lazy"><figcaption><h3>A moment on the rooftop.</h3><p>Small head glances, breathing and clothing movement. Rare aerial crossings reward a longer look.</p></figcaption></figure>
+    </div>
+    <p class="scene-note">Made for a dark desktop, with deep shadows and restrained highlights. The preview is a short excerpt; the download contains the complete 128-second loop.</p>
+  </section>
+
+  <section class="player section" id="player" aria-labelledby="player-title">
+    <div class="section-heading"><h2 id="player-title">A living desktop.<br>A native player.</h2><div><p>Phosphene integrates with the macOS wallpaper system. This community edition gives its controller a Rust-built AppKit interface, with the Apple platform services retained in Swift.</p><p class="small">App version <strong>1.9.1</strong> · Build <strong>20261109.1</strong><br>Wallpaper revisions have their own version numbers.</p></div></div>
+    <div class="app-stage"><img class="library-shot" src="assets/app-library.webp" width="1100" height="792" alt="Actual Phosphene 1.9.1 Library window showing Night City v7, technical specifications and Apply Wallpaper." loading="lazy"><img class="popover-shot" src="assets/app-popover.webp" width="382" height="586" alt="Actual native menu-bar panel showing the selected wallpaper, playback controls, launch at login and pause when hidden." loading="lazy"></div>
+    <p class="caption">Actual app-window captures. The desktop, personal files and account details are excluded.</p>
+    <div class="player-notes"><div><h3>One current release.</h3><p>The latest wallpaper leads the library. History keeps earlier revisions together; title changes keep the same release number.</p></div><div><h3>Apply means apply.</h3><p>The native Apply Wallpaper action selects the video provider directly, avoiding an MP4 being mistaken for a still image.</p></div><div><h3>At home on macOS.</h3><p>Desktop and lock-screen integration, launch at login, and pause-when-hidden controls use the existing Phosphene services.</p></div></div>
+    <details class="history-demo"><summary>See the release History in the app</summary><img src="assets/app-history.webp" width="1100" height="792" alt="Phosphene History showing the seven retained Night City releases, v7 through v1." loading="lazy"></details>
+    <details class="history-demo"><summary>See a detail of the actual native desktop</summary><img src="assets/desktop-detail.webp" width="1133" height="997" alt="Actual native wallpaper desktop capture, cropped to the city only so no files or menu-bar data are visible." loading="lazy"><p class="caption">A crop of the native desktop, with personal files and system UI outside the captured area.</p></details>
+  </section>
+
+  <section class="downloads section" id="downloads" aria-labelledby="download-title">
+    <div class="section-heading"><h2 id="download-title">Take the night<br>with you.</h2><p>Download the current wallpaper or explore its earlier cuts. The original master stays in 4K; lower-frame-rate variants suit quieter playback.</p></div>
+    <div class="download-layout"><div class="release-art"><img id="release-poster" src="assets/night-city-v7.jpg" width="1280" height="720" alt="Night City v7 Blue district wallpaper preview" loading="lazy"><p id="release-note">Current release. Fixed camera; no passing train.</p></div><div class="release-info"><label for="release-select">Wallpaper release</label><select id="release-select"><option value="7">v7 · Blue district — current</option><option value="6">v6 · Living metropolis</option><option value="5">v5 · Evolving weather</option><option value="4">v4 · OLED detail</option><option value="3">v3 · After-hours cinema</option><option value="2">v2 · OLED midnight</option><option value="1">v1 · Fixed camera</option></select><h3 id="release-title">Blue district</h3><p id="release-spec">3840 × 2160 · 30 fps · 128 seconds</p><a id="release-download" class="button primary" href="https://github.com/korisame/phosphene-night-city/releases/download/wallpaper-v7/Night-City-v7-4K.mp4">Download 4K video <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14m-6-6 6 6 6-6M5 21h14"/></svg></a><div id="current-extras" class="extra-downloads"><a href="https://github.com/korisame/phosphene-night-city/releases/download/wallpaper-v7/Night-City-v7-4K-15fps.mp4">4K · 15 fps</a><a href="https://github.com/korisame/phosphene-night-city/releases/download/wallpaper-v7/Night-City-v7-4K-5fps.mp4">4K · 5 fps</a><a href="assets/night-city-4k.webp" download="Night-City-v7-4K.webp">4K still image</a></div><p class="small">Silent H.264 MP4. <a href="https://github.com/korisame/phosphene-night-city/releases/tag/wallpaper-v7" id="release-notes">Release notes &amp; checksums</a></p><p id="catalog-status" class="small" role="status"></p><noscript><p>The release selector needs JavaScript. <a href="https://github.com/korisame/phosphene-night-city/releases">Browse all releases on GitHub</a>.</p></noscript></div></div>
+    <div class="setup"><h3>Bring it to your desktop.</h3><ol><li><strong>Get a player.</strong> Use <a href="https://kagerou.glass/phosphene/">the original Phosphene</a>, or <a href="https://github.com/korisame/phosphene-night-city/blob/main/BUILDING.md">build this Rust community edition</a>.</li><li><strong>Import the video.</strong> Choose Add Video in Phosphene and select the downloaded MP4.</li><li><strong>Apply the wallpaper.</strong> In this edition, select it in Library and choose Apply Wallpaper. In upstream Phosphene, select its collection in System Settings → Wallpaper.</li></ol><p class="small">macOS 26 or later with the required Apple tools for a source build. Private wallpaper APIs may change between OS releases. The community edition is source-only; no signed or notarized app download is provided. Avoid running two copies with the same bundle identifier.</p></div>
+  </section>
+
+  <section class="credits section" id="credits" aria-labelledby="credits-title"><div class="section-heading"><h2 id="credits-title">Built on good work.<br>Credited properly.</h2><p>An independent fan project, shared with its source and its process. Phosphene and the world that inspired this scene belong to their respective creators.</p></div><dl><div><dt>Original app &amp; identity</dt><dd><a href="https://github.com/kageroumado/phosphene">Phosphene by kageroumado</a>. Original app, wallpaper integration and icon. MIT-licensed; original notices retained.</dd></div><div><dt>This edition</dt><dd><a href="https://github.com/korisame">korisame</a> — direction and curation. Rust adaptation, procedural animation and web presentation developed with OpenAI Codex. The illustration assets were created with AI assistance for this project.</dd></div><div><dt>World &amp; characters</dt><dd><a href="https://www.cyberpunk.net/en/edgerunners">Cyberpunk: Edgerunners</a> by CD PROJEKT RED and Studio TRIGGER. Cyberpunk 2077, Night City and depicted characters remain the property of their respective owners. No affiliation or endorsement.</dd></div><div><dt>Type &amp; dependencies</dt><dd>Barlow Condensed by the Barlow Project Authors, SIL Open Font License. Rust, objc2, Swift, AVFoundation, @napi-rs/canvas and FFmpeg support the work. <a href="https://github.com/korisame/phosphene-night-city/blob/main/CREDITS.md">Full credits &amp; licensing</a>.</dd></div></dl><p class="small">Code is available under the MIT license, with dependency licenses retained. Fan artwork is separate from the code license; no rights to third-party characters, trademarks or commercial use are granted.</p></section>
+</main>
+<footer><a class="brand" href="#main"><img src="assets/phosphene-icon.png" width="32" height="32" alt=""><span>Phosphene<span class="edition">Night City Edition</span></span></a><p>Keep the camera still.<br>Let the city breathe.</p><a href="https://github.com/korisame/phosphene-night-city">Explore the source <span aria-hidden="true">↗</span></a></footer>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "phosphene-night-city-renderer",
+  "private": true,
+  "version": "7.0.0",
+  "description": "Fixed-camera 4K fan-art wallpaper renderer",
+  "scripts": {
+    "draft": "node render.cjs --draft",
+    "render": "node render.cjs",
+    "verify:source": "node render.cjs --verify-source"
+  },
+  "dependencies": { "@napi-rs/canvas": "0.1.100" }
+}

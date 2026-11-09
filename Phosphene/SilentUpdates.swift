@@ -8,8 +8,10 @@ import TiptoeGitHub
 /// silently when the user allows it, on an explicit install otherwise.
 ///
 /// The heavy lifting is [Tiptoe](https://github.com/artginzburg/Tiptoe) over mxcl/AppUpdater:
-/// AppUpdater checks the release, downloads the DMG, and verifies the Team ID against the running
-/// app; Tiptoe decides *when* the swap may run, waiting for the Mac to go quiet. The swap restarts
+/// AppUpdater checks the release, downloads the DMG, and verifies the original Developer ID
+/// identity. The local fork permits the explicitly pinned native Rust build to return to that
+/// vendor, with separate installed/candidate identities checked across replacement. Tiptoe
+/// decides *when* the swap may run, waiting for the Mac to go quiet. The swap restarts
 /// the app — harmless for a menu bar controller (the wallpaper extension is a separate process and
 /// keeps playing) — except while a video optimization is running, so the gate below vetoes exactly
 /// that. The gate is a veto, not a preference: Tiptoe's own patience relaxes over days, this never

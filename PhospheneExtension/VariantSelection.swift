@@ -23,18 +23,11 @@ enum VariantSelection {
         variants: [VideoVariant],
     ) -> VideoVariant? {
         guard !variants.isEmpty else { return nil }
-        let sorted = variants.sorted { $0.fps > $1.fps }
-
-        switch policy {
-        case .paused:
-            return nil
-        case .full:
-            guard let top = sorted.first, top.fps >= sourceFPS else { return nil }
-            return top
-        case .reduced:
-            return sorted.first { $0.fps < sourceFPS } ?? sorted.last
-        case .minimal:
-            return sorted.last
+        let rates = variants.map { Int64($0.fps) }
+        let index = rates.withUnsafeBufferPointer {
+            rustVariant(UInt32(policy.rawValue), Int64(sourceFPS), $0.baseAddress, $0.count)
         }
+        guard index >= 0, index < variants.count else { return nil }
+        return variants[Int(index)]
     }
 }

@@ -105,6 +105,11 @@ enum VideoOptimizationService {
         }
 
         var results: [(url: URL, variant: VideoVariant)] = []
+        let runDirectory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("Phosphene-Optimization-\(UUID().uuidString)", isDirectory: true)
+        try FileManager.default.createDirectory(at: runDirectory, withIntermediateDirectories: true)
+        var completed = false
+        defer { if !completed { try? FileManager.default.removeItem(at: runDirectory) } }
 
         for (tierIndex, tierFPS) in tiers.enumerated() {
             try Task.checkCancellation()
@@ -113,11 +118,7 @@ enum VideoOptimizationService {
             let tierWeight = 1.0 / Double(tiers.count)
 
             let filename = "variant_\(tierFPS)fps.mp4"
-            let outputURL = FileManager.default.temporaryDirectory
-                .appendingPathComponent(filename)
-
-            // Remove any existing file at the output path.
-            try? FileManager.default.removeItem(at: outputURL)
+            let outputURL = runDirectory.appendingPathComponent(filename)
 
             try await encodeTier(
                 asset: asset,
@@ -131,6 +132,7 @@ enum VideoOptimizationService {
                 tierWeight: tierWeight,
                 progress: progress,
             )
+            try Task.checkCancellation()
 
             let variant = VideoVariant(
                 filename: filename,
@@ -141,6 +143,7 @@ enum VideoOptimizationService {
         }
 
         await MainActor.run { progress(1.0) }
+        completed = true
         return results
     }
 
@@ -216,13 +219,15 @@ enum VideoOptimizationService {
         nonisolated(unsafe) let w = writer
         nonisolated(unsafe) let wi = writerInput
 
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+        let cancellation = RustCancellation()
+        try await withTaskCancellationHandler {
+          try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
             DispatchQueue(label: "com.phosphene.encoding", qos: .userInitiated).async {
                 var nextKeepTime = CMTime.zero
                 var frameCount = 0
 
                 while unsafe r.status == .reading {
-                    if Task.isCancelled {
+                    if cancellation.isCancelled {
                         unsafe r.cancelReading()
                         unsafe w.cancelWriting()
                         continuation.resume(throwing: CancellationError())
@@ -230,6 +235,17 @@ enum VideoOptimizationService {
                     }
 
                     while unsafe !wi.isReadyForMoreMediaData {
+                        if cancellation.isCancelled {
+                            unsafe r.cancelReading()
+                            unsafe w.cancelWriting()
+                            continuation.resume(throwing: CancellationError())
+                            return
+                        }
+                        guard unsafe w.status == .writing else {
+                            unsafe r.cancelReading()
+                            continuation.resume(throwing: OptimizationError.encodingFailed(unsafe w.error?.localizedDescription ?? "Writer stopped accepting frames"))
+                            return
+                        }
                         Thread.sleep(forTimeInterval: 0.001)
                     }
 
@@ -242,7 +258,12 @@ enum VideoOptimizationService {
                     guard pts >= nextKeepTime else { continue }
                     nextKeepTime = pts + frameDuration
 
-                    unsafe wi.append(sampleBuffer)
+                    guard unsafe wi.append(sampleBuffer) else {
+                        unsafe r.cancelReading()
+                        unsafe w.cancelWriting()
+                        continuation.resume(throwing: OptimizationError.encodingFailed(unsafe w.error?.localizedDescription ?? "Writer rejected a frame"))
+                        return
+                    }
 
                     frameCount += 1
                     if frameCount % 30 == 0 {
@@ -258,7 +279,9 @@ enum VideoOptimizationService {
 
                 unsafe wi.markAsFinished()
                 unsafe w.finishWriting {
-                    if unsafe w.status == .completed {
+                    if cancellation.isCancelled {
+                        continuation.resume(throwing: CancellationError())
+                    } else if unsafe w.status == .completed {
                         continuation.resume()
                     } else {
                         continuation.resume(throwing: OptimizationError.encodingFailed(
@@ -267,6 +290,9 @@ enum VideoOptimizationService {
                     }
                 }
             }
+          }
+        } onCancel: {
+            cancellation.cancel()
         }
 
         if reader.status == .failed {

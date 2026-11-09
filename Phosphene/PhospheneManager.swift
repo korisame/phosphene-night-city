@@ -1,7 +1,8 @@
 import AVFoundation
 import os
 import ServiceManagement
-import SwiftUI
+import AppKit
+import Observation
 import UniformTypeIdentifiers
 
 @MainActor
@@ -19,6 +20,7 @@ final class PhospheneManager {
     var showOptimizationAlert = false
     var optimizationAlertMessage = ""
     @ObservationIgnored private var optimizationTask: Task<Void, Never>?
+    @ObservationIgnored private var optimizationRunID: UUID?
 
     // MARK: - Preferences
 
@@ -133,11 +135,14 @@ final class PhospheneManager {
         isOptimizing = true
         optimizingEntryID = entryID
         optimizationProgress = 0
+        let runID = UUID()
+        optimizationRunID = runID
 
         let entry = VideoDeploymentService.listEntries().first(where: { $0.id == entryID })
         guard let entry else {
             isOptimizing = false
             optimizingEntryID = nil
+            optimizationRunID = nil
             return
         }
 
@@ -149,26 +154,37 @@ final class PhospheneManager {
                 let variants = try await VideoOptimizationService.createVariants(
                     sourceURL: sourceURL,
                     targetResolution: target,
-                    progress: { @MainActor in self.optimizationProgress = $0 },
+                    progress: { @MainActor in
+                        if self.optimizationRunID == runID { self.optimizationProgress = $0 }
+                    },
                 )
-                await MainActor.run {
-                    VideoDeploymentService.deployVariants(entryID: entryID, variants: variants)
+                defer {
+                    for (url, _) in variants { try? FileManager.default.removeItem(at: url) }
+                    if let directory = variants.first?.url.deletingLastPathComponent() {
+                        try? FileManager.default.removeItem(at: directory)
+                    }
                 }
-                for (url, _) in variants {
-                    try? FileManager.default.removeItem(at: url)
+                try Task.checkCancellation()
+                await MainActor.run {
+                    guard self.optimizationRunID == runID else { return }
+                    VideoDeploymentService.deployVariants(entryID: entryID, variants: variants)
                 }
             } catch is CancellationError {
                 // user cancelled
             } catch {
                 await MainActor.run {
+                    guard self.optimizationRunID == runID else { return }
                     self.optimizationAlertMessage = error.localizedDescription
                     self.showOptimizationAlert = true
                 }
             }
 
             await MainActor.run {
+                guard self.optimizationRunID == runID else { return }
                 self.isOptimizing = false
                 self.optimizingEntryID = nil
+                self.optimizationRunID = nil
+                self.optimizationTask = nil
             }
         }
     }
@@ -180,6 +196,7 @@ final class PhospheneManager {
     func cancelOptimization() {
         optimizationTask?.cancel()
         optimizationTask = nil
+        optimizationRunID = nil
         isOptimizing = false
         optimizingEntryID = nil
     }

@@ -110,67 +110,19 @@ nonisolated enum PlaybackPolicy: Int, Comparable, Sendable {
         screenSaverIsOurs: Bool,
         power: PowerState = PowerState(),
     ) -> PlaybackPolicy {
-        var worst: PlaybackPolicy = .full
-
-        // Presentations where the wallpaper fills the screen with nothing over it:
-        // the lock screen, and the screensaver when the screensaver is ours.
-        let fullScreenPresentation = presentationMode == .locked
-            || (presentationMode == .idle && screenSaverIsOurs)
-
-        // --- paused tier ---
-        if userPaused {
-            worst = max(worst, .paused)
-        }
-        if power.thermalState == .critical {
-            worst = max(worst, .paused)
-        }
-        if power.batteryLevel < 10 {
-            worst = max(worst, .paused)
-        }
-        if activityState == .suspended {
-            worst = max(worst, .paused)
-        }
-        if presentationMode == .idle, !screenSaverIsOurs {
-            worst = max(worst, .paused)
-        }
-        if power.isGameModeActive {
-            worst = max(worst, .paused)
-        }
-        // The user dimmed the backlight to ~zero. The display is technically awake, so
-        // `screensDidSleep` doesn't fire and the agent never switches to idle.
-        if power.displayBrightness < Self.brightnessPauseThreshold {
-            worst = max(worst, .paused)
-        }
-        // Desktop occlusion is irrelevant on full-screen presentations.
-        if pauseWhenOccluded, desktopOccluded, !fullScreenPresentation {
-            worst = max(worst, .paused)
-        }
-        // A fullscreen app owning the display pauses unconditionally: the wallpaper is
-        // invisible and the app wants the hardware. Catches what Game Mode can't —
-        // gamepolicyd never recognizes Wine games.
-        if displayHasFullscreenApp, !fullScreenPresentation {
-            worst = max(worst, .paused)
-        }
-        if alwaysPauseDesktop, !fullScreenPresentation {
-            worst = max(worst, .paused)
-        }
-
-        // --- minimal tier ---
-        if power.thermalState == .serious {
-            worst = max(worst, .minimal)
-        }
-        if power.isOnBattery, power.batteryLevel < 20 {
-            worst = max(worst, .minimal)
-        }
-
-        // --- reduced tier ---
-        if power.thermalState == .fair {
-            worst = max(worst, .reduced)
-        }
-        if power.isOnBattery {
-            worst = max(worst, .reduced)
-        }
-
-        return worst
+        let mode: UInt32 = presentationMode == .locked ? 1 : presentationMode == .idle ? 2 : 0
+        var flags: UInt32 = 0
+        if userPaused { flags |= 1 }
+        if activityState == .suspended { flags |= 2 }
+        if power.isGameModeActive { flags |= 4 }
+        if pauseWhenOccluded && desktopOccluded { flags |= 8 }
+        if displayHasFullscreenApp { flags |= 16 }
+        if alwaysPauseDesktop { flags |= 32 }
+        if power.isOnBattery { flags |= 64 }
+        if screenSaverIsOurs { flags |= 128 }
+        return PlaybackPolicy(rawValue: Int(rustPlaybackPolicy(
+            mode, flags, UInt32(power.thermalState.rawValue),
+            Int32(clamping: power.batteryLevel), power.displayBrightness,
+        ))) ?? .paused
     }
 }
