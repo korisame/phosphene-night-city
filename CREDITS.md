@@ -13,11 +13,10 @@ notices remain in [LICENSE](LICENSE); upstream history is retained.
 **[korisame](https://github.com/korisame)** — direction, review and curation of the
 Night City edition, wallpaper iterations and Rust adaptation.
 
-**OpenAI Codex** — assisted software implementation, procedural animation,
-verification and web presentation. Illustration layers were created with AI
-assistance for this project, then layered and animated with code. No claim is
-made that those illustrations were drawn by the original Phosphene author or
-by the official anime artists.
+The edition brings together a native Rust interface, procedural animation and
+project-specific fan artwork. See [artwork provenance](ARTWORK.md) for the
+illustration assets. The original Phosphene author and the official anime
+artists are not credited as the creators of this fan artwork.
 
 ## Creative inspiration
 

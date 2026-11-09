@@ -67,7 +67,7 @@ No always-running web server is required for the app or site. Large video master
 
 ## Credits and licenses
 
-**kageroumado** created Phosphene, its icon and the original macOS wallpaper integration. **korisame** directs and curates this adaptation; development, procedural animation and web presentation were assisted by **OpenAI Codex**, with AI-assisted illustration assets.
+**kageroumado** created Phosphene, its icon and the original macOS wallpaper integration. **korisame** directs and curates the Night City edition, its animated wallpaper and native Rust interface.
 
 The scene is fan artwork inspired by **Cyberpunk: Edgerunners**, a collaboration between **CD PROJEKT RED and Studio TRIGGER**. Night City, Cyberpunk 2077 and depicted characters belong to their respective owners. This project is unaffiliated and is not an official game/anime asset pack.
 
