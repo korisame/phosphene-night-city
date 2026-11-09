@@ -31,3 +31,10 @@ not itself desktop playback evidence.
 
 Private machine logs, signing details, system preference dumps and acceptance
 captures stay local. They are not included in repository history or release assets.
+
+Hosted native source checks target the standard macOS26 Intel runner and retain
+the complete formatting, regression-test and strict-lint command set. On9November
+GitHub failed to allocate its ARM runner before checkout, explicitly reporting
+capacity constraints. Apple Silicon source tests and installed desktop playback
+were checked locally. A hosted source-test result is not proof of the full GUI
+or wallpaper-extension lifecycle on Intel.

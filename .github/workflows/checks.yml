@@ -10,7 +10,9 @@ concurrency:
   cancel-in-progress: true
 jobs:
   rust:
-    runs-on: macos-26
+    # Hosted ARM allocation failed before checkout; retain the complete suite
+    # on a standard macOS 26 Intel runner. Apple Silicon was checked locally.
+    runs-on: macos-26-intel
     steps:
       - uses: actions/checkout@v7.0.1
       - name: Install stable Rust
