@@ -5,9 +5,12 @@ on:
   pull_request:
 permissions:
   contents: read
+concurrency:
+  group: source-checks-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   rust:
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
       - name: Install stable Rust
